@@ -1,21 +1,35 @@
 <%- include("partials/header"); %>
-<h1>Welcome to the signup page</h1>
+<div class="container ">
+	<div class="row">
+		<div class="col-lg-2"></div>
+		<div class="col-lg-8 border rounded-sm border-primary pb-2">
+			<div class="text-center text-primary pb-3">
+				<h1><strong>HypaY</strong></h1>
+			</div>
 
-<% if(exists==true){ %>
-	<p>User name exists...try another</p>
-<% } %>
-
-<form method="POST" action="/addUser">
-	<label for="uname">Name :</label>
-	<input type="text" id="uname" name="uname" >
-	
-	<label for="uno">Number :</label>
-	<input type="text" id="uno" name="uno" >
-	
-	<label for="upass">Pass :</label>
-	<input type="password" id="upass" name="upass" >
-	
-	<input type="submit" value="Submit">
-</form>
-
+			<form method="POST" action="/register">
+				<div class="form-group ">
+					<label for="uname">Name :</label>
+					<input type="text" id="uname" name="uname" placeholder="User name" class="form-control" >
+				</div>
+				<div class="form-group ">
+					<label for="username">Number :</label>
+					<input type="text" id="username" name="username" placeholder="Mobile no" class="form-control">
+				</div>
+				<div class="form-group ">
+					<label for="upass">Pass :</label>
+					<input type="password" id="upass" name="upass" placeholder="Password" class="form-control">
+				</div>
+				<div class="text-center">
+					<!-- <button type="submit" value="login" class="btn btn-primary"> -->
+					<button type="submit" class="btn btn-primary" >Sign up</button>
+					<p></p>
+				</div>
+			</form>
+			
+			
+		</div>
+		<div class="col-lg-2"></div>
+	</div>
+</div>
 <%- include("partials/footer"); %>
