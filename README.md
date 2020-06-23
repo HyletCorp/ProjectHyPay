@@ -1,2 +1,0 @@
-# ProjectHyPay
-Development repo

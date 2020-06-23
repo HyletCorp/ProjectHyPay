@@ -8,12 +8,13 @@ var express               = require("express"),
     User                  = require("./models/user"); 
 
 var app = express();
+var check = false;
 
 // TO ENABLE BODY PARSING
 app.use(bodyparser.urlencoded({extented:true}));
 
 app.use(require("express-session")({
-	secret : "i love my doggy",
+	secret : "ThisIsNotMy Random_Salt",
 	resave : false,
 	saveUninitialized : false
 }));
@@ -23,11 +24,10 @@ app.use(passport.session());
 
 
 passport.use(new LocalStrategy(User.authenticate()));
-// passport.use(User.createStrategy());
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
-// TO INTIMATE EXPRESS TO LOOK IN THAT Dir
+// TO INTIMATE EXPRESS TO LOOK IN THAT Dir()
 app.use(express.static('public'));
 
 
@@ -72,61 +72,22 @@ function addUser(formResult){
 
 // SETTING UP THE VIEW ENGINE
 app.set("view engine","ejs");
+
 // ************
-// GET REQUESTS
+// LOGIN ROUTES
 // ************
 
 app.get("/",function(req,res){
 	//CALLING THE LOGIN PAGE
-	res.render("login");
-	
-	// TO DO -> VALIDATE THE LOGIN DATA
+	res.render("login",{check:check});
+	check = false;
 });
 
-
-// RENDERS THE SIGN IN PAGE
-
-app.get("/signup",function(req,res){
-	//CALLING THE SIGNUP PAGE
-	res.render("signup");
-});
-
-app.get("/logged",isLoggedIn,function(req,res){
-	res.render("logged");
-});
-
-// ************
-// POST REQUESTS
-// ************
-
-
-
-//	SIGNUP POST REQUEST
-
-app.post("/register",function(req,res){
-	var FormResult=req.body;	
-	User.register(new User({uname:FormResult.uname,username:FormResult.username}),FormResult.upass,function(err,user){
-		if(err){
-			console.log(err);
-			res.send("could not be added to the db");
-		}else{
-			
-				// passport.authenticate('local',req,res,
-				// function() {
-				// res.redirect('/secret');
-				// });
-			res.redirect("/");
-		}
-		
-	});	
-});
-
-// LOGIN PAGE POST REQUEST
 
 app.post('/login', 
-  passport.authenticate('local', { failureRedirect: '/',successRedirect: "/logged"}),
+  passport.authenticate('local', { failureRedirect: '/'}),
   function(req, res) {
-    res.redirect('/logged');
+    res.render("logged");
   });
 
 // FUNCTION TO CHECK LOG-IN STATUS
@@ -137,7 +98,40 @@ function isLoggedIn(req,res,next){
 	}
 	res.redirect("/");
 }
-// LOGOUT POST REQUEST
+
+app.get("/logged",isLoggedIn,function(req,res){
+	res.render("logged");
+});
+
+// ************
+// SIGNUP ROUTES
+// ************
+
+app.get("/signup",function(req,res){
+	//CALLING THE SIGNUP PAGE
+	res.render("signup",{exists:false});
+	exists = false;
+});
+
+
+app.post("/register",function(req,res){
+	User.register(new User({uname:req.body.uname,username:req.body.username}),req.body.upass,function(err,user){
+		if(err){
+			if(err.name === "UserExistsError"){
+				res.render("signup",{exists:true});
+			}else{
+				res.send("could not be added to the db");
+			}
+		}else{
+			res.render("logged");
+		}
+		
+	});	
+});
+
+// *************
+// LOGOUT ROUTES
+// *************
 
 app.get("/logout",(req,res)=>{
 	req.logout();
